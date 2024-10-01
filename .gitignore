@@ -1,0 +1,5 @@
+.DS_Store
+build/
+output/
+.cache/
+.vscode/
