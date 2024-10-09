@@ -3,6 +3,8 @@
 #include "OS-ImGui.h"
 #include "OS-ImGui_Struct.h"
 #include "imgui_internal.h"
+#include "stb_image.h"
+#include <GLES/gl.h>
 
 namespace OSImGui {
 void OSImGui::Text(std::string Text, Vec2 Pos, ImColor Color, float FontSize) {
@@ -42,6 +44,20 @@ void OSImGui::RectangleFilled(Vec2 Pos, Vec2 Size, ImColor Color, float Rounding
         DrawList->PathArcTo(ImVec2(a.x + Rounding, b.y - Rounding), Rounding, IM_PI / 2.f, IM_PI, Nums);
     }
     DrawList->PathFillConvex(Color);
+}
+
+void OSImGui::HollowRect(Vec4 Pos, ImColor color, float thickness) {
+    int iw = Pos.w / 4;
+    int ih = Pos.h / 4;
+    // top
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x, Pos.y), ImVec2(Pos.x + iw, Pos.y), color, thickness);                                         // left
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x + Pos.w - iw, Pos.y), ImVec2(Pos.x + Pos.w, Pos.y), color, thickness);                         // right
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x, Pos.y), ImVec2(Pos.x, Pos.y + ih), color, thickness);                                         // top left
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x + Pos.w - 1, Pos.y), ImVec2(Pos.x + Pos.w - 1, Pos.y + ih), color, thickness);                 // top right
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x, Pos.y + Pos.h), ImVec2(Pos.x + iw, Pos.y + Pos.h), color, thickness);                         // left
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x + Pos.w - iw, Pos.y + Pos.h), ImVec2(Pos.x + Pos.w, Pos.y + Pos.h), color, thickness);         // right
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x, Pos.y + Pos.h - ih), ImVec2(Pos.x, Pos.y + Pos.h), color, thickness);                         // bottom left
+    ImGui::GetForegroundDrawList()->AddLine(ImVec2(Pos.x + Pos.w - 1, Pos.y + Pos.h - ih), ImVec2(Pos.x + Pos.w - 1, Pos.y + Pos.h), color, thickness); // bottom right
 }
 
 void OSImGui::Line(Vec2 From, Vec2 To, ImColor Color, float Thickness) {
@@ -339,6 +355,29 @@ bool OSImGui::SwitchForRight(const char *str_id, bool *v) {
     DrawList->AddCircle(ImVec2(p.x + Radius + t * (Width - Radius * 2) + (t == 0 ? 2 : -2), p.y + Radius + 2), Radius, IM_COL32(20, 20, 20, 80), 360, 1);
 
     return *v; // 返回复选框是否被点击
+}
+
+ImTextureID OSImGui::createTexturePNGFromMem(unsigned char *buf, int len) {
+    int w, h, n;
+    stbi_uc *data = stbi_png_load_from_memory(buf, len, &w, &h, &n, 0);
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if (n == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                     data);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                     data);
+    }
+    stbi_image_free(data);
+
+    return (ImTextureID)texture;
 }
 
 } // namespace OSImGui

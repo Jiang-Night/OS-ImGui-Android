@@ -16,6 +16,7 @@ public:
     // 矩形
     void Rectangle(Vec2 Pos, Vec2 Size, ImColor Color, float Thickness, float Rounding = 0);
     void RectangleFilled(Vec2 Pos, Vec2 Size, ImColor Color, float Rounding = 0, int Nums = 15);
+    void HollowRect(Vec4 Pos, ImColor color, float thickness = 1.f);
     // 线
     void Line(Vec2 From, Vec2 To, ImColor Color, float Thickness);
     // 圆形
@@ -42,6 +43,8 @@ public:
     bool SwitchForLeft(const char *str_id, bool *v);
     // 右Switch
     bool SwitchForRight(const char *str_id, bool *v);
+    // 加载png
+    ImTextureID createTexturePNGFromMem(unsigned char *buf, int len);
 };
 
 }; // namespace OSImGui

@@ -1,6 +1,7 @@
 // Self lib
 // System libs
 #include <asm-generic/fcntl.h>
+#include <cstdio>
 #include <cstring>
 #include <dirent.h>
 #include <fcntl.h>
