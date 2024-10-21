@@ -123,7 +123,8 @@ void OSImGui_Base::CleanImGui() {
 }
 
 void OSImGui_Base::NewWindow(std::string WindowName,
-                             std::function<void()> CallBack) {
+                             std::function<void()> CallBack,
+                             std::function<void()> TextureCallBack) {
     std::string WName;
 
     if (!CallBack)
@@ -146,8 +147,12 @@ void OSImGui_Base::NewWindow(std::string WindowName,
     }
 
     updateScreen();
-
     InitTouch(false);
+
+    if (TextureCallBack) {
+        this->TextureCallBackFn = TextureCallBack;
+        this->TextureCallBackFn();
+    }
 
     MainLoop();
 }
