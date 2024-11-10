@@ -36,7 +36,7 @@ void Imgui_demo() {
 }
 
 int main() {
-  Gui.NewWindow("SurafceName", Imgui_demo);
+  Gui.NewWindow("SurafceName", Imgui_demo,nullptr);
 
   std::cout << "Hello, World!" << std::endl;
   return 0;
